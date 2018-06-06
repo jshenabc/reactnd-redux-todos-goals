@@ -59,7 +59,7 @@ function todos (state = [], action) {
 
 }
 
-function goals = (state=[],action){
+function goals (state=[],action){
   switch (action.type) {
     case 'ADD_GOAL':
       return state.concat([action.goal])
@@ -70,7 +70,14 @@ function goals = (state=[],action){
   }
 }
 
-const store = createStore(todos);
+function app (state=[],action){
+  return {
+    todos: todos(state.todos, action),
+    goals: goals(state.goals, action)
+  }
+}
+
+const store = createStore(app);
 
 store.subscribe(() => {
      console.log('The new state is: ', store.getState())
