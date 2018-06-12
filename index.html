@@ -190,6 +190,7 @@
         return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
       }
 
+      //DOM code
       function addTodo (){
         const input = document.getElementById('todo');
         const todoName = input.value;
@@ -226,6 +227,12 @@
         const node = document.createElement('li');
         const text = document.createTextNode(todo.name);
         node.appendChild(text);
+
+        //click to toggle
+        node.style.textDecoration = todo.complete ? 'line-through' : 'none';
+        node.addEventListener('click', () => {
+          store.dispatch(toggleTodoAction(todo.id))
+        })
         document.getElementById('todos').append(node);
       }
 
