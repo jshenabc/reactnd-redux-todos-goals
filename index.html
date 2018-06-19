@@ -105,15 +105,15 @@
       }
 
       //Middleware
-      function checkAndDispatch(store, action){
-        if (action.type === ADD_TODO && action.todo.name.toLowerCase().includes('bitcoin')) {
-          return alert('Try another one')
-        }
-        if (action.type === ADD_GOAL && action.goal.name.toLowerCase().includes('bitcoin')) {
-          return alert('Try another one')
-        }
-        return store.dispatch(action)
-      }
+      // function checkAndDispatch(store, action){
+      //   if (action.type === ADD_TODO && action.todo.name.toLowerCase().includes('bitcoin')) {
+      //     return alert('Try another one')
+      //   }
+      //   if (action.type === ADD_GOAL && action.goal.name.toLowerCase().includes('bitcoin')) {
+      //     return alert('Try another one')
+      //   }
+      //   return store.dispatch(action)
+      // }
 
       // function app (state=[],action){
       //   return {
@@ -127,12 +127,41 @@
       //   goals
       // })
 
+      //Redux Middleware
+      // function checker(store){
+      //   return function (next){
+      //     return function (action){
+      //       if (action.type === ADD_TODO && action.todo.name.toLowerCase().includes('bitcoin')) {
+      //         return alert('Try another one')
+      //       }
+      //       if (action.type === ADD_GOAL && action.goal.name.toLowerCase().includes('bitcoin')) {
+      //         return alert('Try another one')
+      //       }
+      //       return next(action)
+      //     }
+      //   }
+      // }
+
+      //ES6 Version of Redux Middleware
+      const checker = (store) => (next) => (action) => {
+        if (action.type === ADD_TODO && action.todo.name.toLowerCase().includes('bitcoin')) {
+          return alert('Try another one')
+        }
+        if (action.type === ADD_GOAL && action.goal.name.toLowerCase().includes('bitcoin')) {
+          return alert('Try another one')
+        }
+        return next(action)
+      }
+
       //replace createStore(app) with Redux.createStore API
       //replace app function with Redux.combineReducers
+      //const store = Redux.createStore(rootReducer, Redux.applyMiddleware(checker))
+      //applyMiddleware(...middlewares).Note the spread operator on the middlewares parameter. This means that we can pass in as many different middleware as we want! Middleware is called in the order in which they were provided to applyMiddleware().
+      //Redux's createStore() method takes the reducer function as its first argument, but then it can take a second argument of the middleware functions to run. Because we set up the Redux store with knowledge of the middleware function, it runs the middleware function between store.dispatch() and the invocation of the reducer.
       const store = Redux.createStore(Redux.combineReducers({
         todos,
         goals
-      }));
+      }), Redux.applyMiddleware(checker));
 
       store.subscribe(() => {
            //console.log('The new state is: ', store.getState())
@@ -188,7 +217,7 @@
         const todoName = input.value;
         input.value = '';
 
-        checkAndDispatch(store,addTodoAction({
+        store.dispatch(addTodoAction({
           id: generateId (),
           name: todoName,
           complete: false,
@@ -200,7 +229,7 @@
         const goalName = input.value;
         input.value = '';
 
-        checkAndDispatch(store,addGoalAction({
+        store.dispatch(addGoalAction({
           id: generateId (),
           name: goalName,
           complete: false,
@@ -210,6 +239,8 @@
       document.getElementById('todoBtn').addEventListener('click',addTodo);
       document.getElementById('goalBtn').addEventListener('click',addGoal);
       //createRemoveButton
+      //onClick parameter is expected to be a function
+      //Higher-order functions are a powerful programming technique that allow functions to be significantly more dynamic. You've actually already written a higher-order function in this course. The createRemoveButton() function is a higher-order function because the onClick parameter is expected to be a function (because onClick is set up as an event listener callback function.
       function createRemoveButton(onClick){
         const removeBtn = document.createElement('button');
         removeBtn.innerHTML='X';
@@ -227,14 +258,14 @@
         const text = document.createTextNode(todo.name);
         //add removeBtn
         const removeBtn = createRemoveButton(() => {
-          checkAndDispatch(store,removeTodoAction(todo.id))
+          store.dispatch(removeTodoAction(todo.id))
         })
         node.appendChild(text);
         node.appendChild(removeBtn);
         //click to toggle
         node.style.textDecoration = todo.complete ? 'line-through' : 'none';
         node.addEventListener('click', () => {
-          checkAndDispatch(store,toggleTodoAction(todo.id))
+          store.dispatch(toggleTodoAction(todo.id))
         })
         document.getElementById('todos').append(node);
       }
