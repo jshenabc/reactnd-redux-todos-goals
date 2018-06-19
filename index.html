@@ -153,6 +153,16 @@
         return next(action)
       }
 
+      //logger middleware
+      const logger = (store) => (next) => (action) => {
+        console.group(action.type);
+          console.log("The action:",action);
+          const dispatchResult = next(action);
+          console.log("The new state:", store.getState());
+        console.groupEnd();
+        return dispatchResult;
+      }
+
       //replace createStore(app) with Redux.createStore API
       //replace app function with Redux.combineReducers
       //const store = Redux.createStore(rootReducer, Redux.applyMiddleware(checker))
@@ -161,7 +171,7 @@
       const store = Redux.createStore(Redux.combineReducers({
         todos,
         goals
-      }), Redux.applyMiddleware(checker));
+      }), Redux.applyMiddleware(checker,logger));
 
       store.subscribe(() => {
            //console.log('The new state is: ', store.getState())
