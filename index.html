@@ -310,7 +310,7 @@
         e.preventDefault();
         const name = this.inputElement.value;
         this.inputElement.value = '';
-        this.props.store.dispatch(addGoalAction({
+        this.props.store.dispatch(addTodoAction({
           id: generateId (),
           name: name,
           complete: false,
@@ -334,10 +334,26 @@
     }
 
     class Goals extends React.Component {
+      addItem = (e) => {
+        e.preventDefault();
+        const name = this.inputElement.value;
+        this.inputElement.value = '';
+
+        this.props.store.dispatch(addGoalAction({
+          id: generateId(),
+          name
+        }))
+      }
       render() {
         return (
           <div>
-            Goals
+            <h1>Goals</h1>
+            <input
+              type='text'
+              placeholder='Add goal'
+              ref={(input) => this.inputElement = input}
+            />
+            <button onClick={this.addItem}>Add Goal</button>
             <List />
           </div>
 
@@ -350,7 +366,7 @@
         return (
           <div>
             <Todos store={this.props.store}/>
-            <Goals />
+            <Goals store={this.props.store}/>
           </div>
         )
       }
