@@ -68,7 +68,19 @@
         }
       }
       //use thunk
-      //Notice that we’re no longer returning the action itself! Instead, we’re returning a function that is being passed dispatch. We then call this function when we have the data.
+      //handleAddTodo(this.inputElement.value)
+      function handleAddTodo(inputValue, callback) {
+        return (dispatch) => {
+          return API.saveTodo(inputValue)
+            .then((todo) => {
+              dispatch(addTodoAction(todo))
+              callback()
+            }).catch(() => {
+               alert('There was an error. Try again.')
+            })
+        }
+      }
+      //Notice that we’re no longer returning the action itself! Instead, we’re returning a function that is being passed dispatch. We then call this function when we have the data
       function handleDeleteTodo (todo) {
         return (dispatch) => {
           dispatch(
@@ -77,6 +89,19 @@
           return API.deleteTodo(todo.id)
             .catch(() => {
               dispatch(addTodoAction(todo))
+              alert('An error occured!')
+            })
+        }
+      }
+      //handleToggle
+      function handleToggle (id) {
+        return (dispatch) => {
+          dispatch(
+            toggleTodoAction(id)
+          )
+          return API.saveTodoToggle(id)
+            .catch(() => {
+              dispatch(toggleTodoAction(id))
               alert('An error occured!')
             })
         }
@@ -257,13 +282,17 @@
     class Todos extends React.Component {
        addItem = (e) => {
         e.preventDefault();
-        return API.saveTodo(this.inputElement.value)
-          .then((todo) => {
-            this.props.store.dispatch(addTodoAction(todo))
-            this.inputElement.value = '';
-          }).catch(() => {
-             alert('There was an error. Try again.')
-          })
+        // return API.saveTodo(this.inputElement.value)
+        //   .then((todo) => {
+        //     this.props.store.dispatch(addTodoAction(todo))
+        //     this.inputElement.value = '';
+        //   }).catch(() => {
+        //      alert('There was an error. Try again.')
+        //   })
+        this.props.store.dispatch(handleAddTodo(
+          this.inputElement.value,
+          () => this.inputElement.value = ''
+        ))
       }
       removeItem = (todo) => {
         // this.props.store.dispatch(
@@ -277,14 +306,15 @@
         this.props.store.dispatch(handleDeleteTodo(todo))
       }
       toggleItem = (id) => {
-        this.props.store.dispatch(
-          toggleTodoAction(id)
-        )
-        return API.saveTodoToggle(id)
-          .catch(() => {
-            this.props.store.dispatch(toggleTodoAction(id))
-            alert('An error occured!')
-          })
+        // this.props.store.dispatch(
+        //   toggleTodoAction(id)
+        // )
+        // return API.saveTodoToggle(id)
+        //   .catch(() => {
+        //     this.props.store.dispatch(toggleTodoAction(id))
+        //     alert('An error occured!')
+        //   })
+        this.props.store.dispatch(handleToggle(id))
       }
       render() {
         return (
