@@ -68,6 +68,22 @@
         }
       }
       //use thunk
+
+      //handleInitialData
+      function handleInitialData() {
+        return (dispatch) => {
+          return Promise.all([
+            API.fetchTodos(),
+            API.fetchGoals()
+          ]).then(([todos, goals]) => {
+            //fetch default
+            console.log('Todos+Goals', [todos, goals]);
+            //dispatch
+            dispatch(receiveDataAction(todos, goals))
+          })
+        }
+      }
+
       //handleAddTodo(this.inputElement.value)
       function handleAddTodo(inputValue, callback) {
         return (dispatch) => {
@@ -379,16 +395,16 @@
     class App extends React.Component {
       componentDidMount(){
         const {store} = this.props;
-
-        Promise.all([
-          API.fetchTodos(),
-          API.fetchGoals()
-        ]).then(([todos, goals]) => {
-          //fetch default
-          console.log('Todos+Goals', [todos, goals]);
-          //dispatch
-          store.dispatch(receiveDataAction(todos, goals))
-        })
+        store.dispatch(handleInitialData())
+        // Promise.all([
+        //   API.fetchTodos(),
+        //   API.fetchGoals()
+        // ]).then(([todos, goals]) => {
+        //   //fetch default
+        //   console.log('Todos+Goals', [todos, goals]);
+        //   //dispatch
+        //   store.dispatch(receiveDataAction(todos, goals))
+        // })
         store.subscribe(() => this.forceUpdate())
       }
       render() {
