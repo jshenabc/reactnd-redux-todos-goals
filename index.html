@@ -463,9 +463,44 @@
       loading: store.loading
     }))(App)
 
+
     //use React context API
     const Context = React.createContext();
 
+    //Connect function
+    function connect (mapStateToProps) {
+      return (Component) => {
+        class Receiver extends React.Component {
+          componentDidMount () {
+            const { subscribe } = this.props.store
+            this.unsubscribe = subscribe(() => {
+              this.forceUpdate()
+            })
+          }
+          componentWillUnmount() {
+            this.unsubscribe()
+          }
+          render () {
+            const {dispatch,getState} = this.props.store
+            const state = getState()
+            const stateNeeded = mapStateToProps(state)
+
+            return <Component {...stateNeeded} dispatch={dispatch}/>
+          }
+        }
+        class ConnectedComponent extends React.Component {
+          render() {
+            return (
+              <Context.Consumer>
+                {(store) => <Receiver store={store} />}
+              </Context.Consumer>
+            )
+          }
+        }
+
+        return ConnectedComponent
+      }
+    }
     // class ConnectedApp extends React.Component {
     //   render() {
     //     return (
